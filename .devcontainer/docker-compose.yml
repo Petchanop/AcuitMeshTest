@@ -1,0 +1,35 @@
+services:
+  acuitmesh_tic_tac_toe:
+    container_name: acuitmesh_tic_tac_toe
+    env_file: ../tic-tac-toe/.env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # Update this to wherever you want VS Code to mount the folder of your project
+      - ../..:/workspaces:cached
+
+    depends_on:
+      - acuitmeshdb
+    network_mode: service:acuitmeshdb
+    command: sleep infinity
+
+  acuitmeshdb:
+    container_name: acuitmeshdb
+    image: postgres
+    env_file: ../tic-tac-toe/.env
+    ports:
+      - 5432:5432
+
+    volumes:
+      - postgres-acuitmesh:/var/lib/postgresql/data
+
+    networks:
+      - acuitmeshnetwork
+
+
+volumes:
+  postgres-acuitmesh:
+
+networks:
+  acuitmeshnetwork:
