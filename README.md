@@ -1,7 +1,7 @@
 # AcuitMeshTest
 
 Use vscode devcontainer to run this repo
-- create .env file and fill variable use tic-tac-toe/.env.sample as an example
+- create .env file in tic-tac-toe directory and fill variable use tic-tac-toe/.env.sample as an example
 - ctrl + shift + p
 - select rebuild and reopen with container
 - initialize project with npm i
