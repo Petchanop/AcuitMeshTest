@@ -1,0 +1,78 @@
+[
+  {
+    "gameId": 7,
+    "winner": "Player1",
+    "player1": "mobile",
+    "player1Move": [
+      0,4,8
+    ],
+    "player2": "petcha",
+    "player2Move": [
+      1,2,3
+    ],
+    "status": "Completed",
+    "currentTurn": "mobile",
+    "board": [
+      "XOO",
+      "OX5",
+      "67X"
+    ]
+  },
+  {
+    "gameId": 8,
+    "winner": "Player1",
+    "player1": "mobile",
+    "player1Move": [
+      4,8,1,5,3
+    ],
+    "player2": "petcha",
+    "player2Move": [
+      6,0,7,2
+    ],
+    "status": "Completed",
+    "currentTurn": "mobile",
+    "board": [
+      "OXO",
+      "XXX",
+      "OOX"
+    ]
+  },
+  {
+    "gameId": 9,
+    "winner": null,
+    "player1": "petcha",
+    "player1Move": [
+      5
+    ],
+    "player2": "mobile",
+    "player2Move": [
+      4
+    ],
+    "status": "InProgress",
+    "currentTurn": "petcha",
+    "board": [
+      "012",
+      "3OX",
+      "678"
+    ]
+  },
+  {
+    "gameId": 10,
+    "winner": "Draw",
+    "player1": "petcha",
+    "player1Move": [
+      4,7,2,3,8
+    ],
+    "player2": "mobile",
+    "player2Move": [
+      0,1,6,5
+    ],
+    "status": "Completed",
+    "currentTurn": "mobile",
+    "board": [
+      "OOX",
+      "XXO",
+      "OXX"
+    ]
+  }
+]

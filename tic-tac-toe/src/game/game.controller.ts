@@ -91,7 +91,7 @@ export class GameController {
   @ApiResponse({
     status: 201,
     description: 'Move successfully made',
-    type: Move,
+    type: GameBoardDto,
   })
   @ApiResponse({ status: 404, description: 'Game not found' })
   @ApiResponse({

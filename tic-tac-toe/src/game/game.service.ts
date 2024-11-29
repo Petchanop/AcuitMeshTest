@@ -206,19 +206,21 @@ export class GameService {
     }
     await this.dataSource.manager.save(game);
 
-    const result = new GameBoardDto({
-      gameId: game.game_id,
-      winner: game.winner,
-      player1: game.player1.id,
-      player1Move: game.moves
-        .filter((move) => move.player == game.player1)
-        .map((move) => move.position),
-      player2: game.player2.id,
-      player2Move: game.moves
-        .filter((move) => move.player == game.player1)
-        .map((move) => move.position),
-      board: await this.createGameBoard(game, game.moves),
-    });
+    // const result = new GameBoardDto({
+    //   gameId: game.game_id,
+    //   winner: game.winner,
+    //   player1: game.player1.id,
+    //   player1Move: game.moves
+    //     .filter((move) => move.player == game.player1)
+    //     .map((move) => move.position),
+    //   player2: game.player2.id,
+    //   player2Move: game.moves
+    //     .filter((move) => move.player == game.player1)
+    //     .map((move) => move.position),
+    //   board: await this.createGameBoard(game, game.moves),
+    // });
+
+    const result = await this.createGameDto(game);
 
     return result;
   }
@@ -287,13 +289,20 @@ export class GameService {
       ],
       relations: ['player1', 'player2', 'moves'],
     });
-    const win = result.filter((game) => game.winner == user.username);
+    const winPlayer1 = result.filter(
+      (game) => game.player1.id == user.id && game.winner == GameWinner.Player1,
+    );
+    const winPlayer2 = result.filter(
+      (game) => game.player2.id == user.id && game.winner == GameWinner.Player2,
+    );
+    console.log(winPlayer1, winPlayer2);
     const draw = result.filter((game) => game.winner == GameWinner.Draw);
     const userHistory = new UserHistory({
       gamePlayed: result.length,
-      win: win.length,
+      win: winPlayer1.length + winPlayer2.length,
       draw: draw.length,
-      loss: result.length - (win.length + draw.length),
+      loss:
+        result.length - (winPlayer1.length + winPlayer2.length + draw.length),
     });
     return userHistory;
   }
