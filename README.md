@@ -40,4 +40,12 @@
 
 
 ## check game detail which user is a player
+![game me route](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/get_player_game_detail.png)
+
 ![check game detail](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/game_detail_result.png)
+
+## check user game play overall statistic
+
+### /games/history/me
+
+![history me](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/user_game_history.png)
