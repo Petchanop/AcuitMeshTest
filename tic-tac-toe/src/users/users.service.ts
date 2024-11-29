@@ -8,6 +8,7 @@ import {
   CreateUserDto,
   PaginationUserDto,
   UpdateUserDto,
+  UserResponseDto,
 } from './dto/users.dto';
 import { User } from './entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -32,8 +33,8 @@ export class UsersService {
   }
 
   async checkUserAlreadyExists(createUserDto: CreateUserDto): Promise<boolean> {
-    var user: User;
-    var userByEmail: User;
+    let user: User;
+    let userByEmail: User;
     if (createUserDto.username) {
       user = await this.userRepository.findOne({
         where: { username: createUserDto.username },
@@ -54,7 +55,7 @@ export class UsersService {
     const hashPassword = await bcrypt.hash(password, await bcrypt.genSalt());
     return hashPassword;
   }
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     if (await this.checkUserAlreadyExists(createUserDto)) {
       throw new HttpException(
         'Username or Email already exists',
@@ -68,17 +69,17 @@ export class UsersService {
       role: createUserDto.role,
     });
     this.dataSource.getRepository(User).save(user);
-    return user;
+    return new UserResponseDto(user);
   }
 
-  async findAll(query: PaginationUserDto): Promise<User[]> {
+  async findAll(query: PaginationUserDto): Promise<UserResponseDto[]> {
     const { page, pageSize } = query;
     const skip = (page - 1) * pageSize;
     const users = await this.userRepository.find({
       take: pageSize,
       skip: skip,
     });
-    return users;
+    return users.map((user) => new UserResponseDto(user));
   }
 
   async getUserByUserName(username: string): Promise<User> | null {
@@ -100,14 +101,14 @@ export class UsersService {
   }
 
   async update(id: UUID, updateUserDto: UpdateUserDto): Promise<User> {
-    console.log('update', updateUserDto);
     const user: User = await this.userRepository.findOne({ where: { id } });
     if (!user) throw new HttpException('User not Found', HttpStatus.NOT_FOUND);
     try {
       updateUserDto.password = await this.hashPassword(updateUserDto.password);
-    } catch (error) {}
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     const updated = Object.assign(user, updateUserDto);
-    console.log('update', updated);
     return this.userRepository.save(updated);
   }
 

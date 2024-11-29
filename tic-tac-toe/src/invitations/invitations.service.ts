@@ -132,7 +132,6 @@ export class InvitationsService {
     userId: UUID,
     type: string,
   ): Promise<InvitationDto[]> {
-    console.log(userId, type);
     let invitations: Invitation[];
     switch (type) {
       case InvitationType.DEFAULT:

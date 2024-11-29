@@ -23,6 +23,7 @@ import {
   CreateUserDto,
   PaginationUserDto,
   UpdateUserDto,
+  UserResponseDto,
 } from './dto/users.dto';
 import { Roles } from './decorator/roles.decorator';
 import { SlugIdInterceptor } from 'src/interceptors/slugid.interceptor';
@@ -43,10 +44,10 @@ export class UsersController {
   })
   @ApiCreatedResponse({
     description: 'create user',
-    type: User,
+    type: UserResponseDto,
   })
   @ApiBearerAuth('JWT')
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
+  create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const res = this.userService.create(createUserDto);
     return res;
   }
@@ -80,7 +81,6 @@ export class UsersController {
   @ApiBearerAuth('JWT')
   async userUpdate(@Req() req, @Body() updateUserDto: UpdateUserDto) {
     const user = req.user;
-    console.log(user);
     const res = await this.userService.update(user.id, updateUserDto);
     return res;
   }
@@ -92,10 +92,10 @@ export class UsersController {
   })
   @ApiCreatedResponse({
     description: 'reponse all users to admin',
-    type: User,
+    type: UserResponseDto,
   })
   @ApiBearerAuth('JWT')
-  async findAll(@Query() query: PaginationUserDto): Promise<User[]> {
+  async findAll(@Query() query: PaginationUserDto): Promise<UserResponseDto[]> {
     const users = this.userService.findAll(query);
     return users;
   }
@@ -164,7 +164,6 @@ export class UsersController {
   })
   @ApiBearerAuth('JWT')
   async update(@Param('id') id: UUID, @Body() updateUserDto: UpdateUserDto) {
-    console.log('admin update', id, updateUserDto);
     const user = await this.userService.update(id, updateUserDto);
     return user;
   }

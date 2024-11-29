@@ -18,12 +18,10 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    console.log('jwt guard');
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
-    console.log('jwt guard', 'is public', isPublic);
     if (isPublic) {
       return true;
     }
@@ -39,11 +37,9 @@ export class AuthGuard implements CanActivate {
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       payload.id = slugid.decode(payload.id);
-      console.log('pass authen', payload);
       request['user'] = payload;
     } catch (error) {
-      console.log(error);
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(error);
     }
     return true;
   }

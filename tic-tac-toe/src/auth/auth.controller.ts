@@ -8,34 +8,33 @@ import { Public } from './decorator/auth.decorator';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
-    @Public()
-    @Post('/register')
-    @ApiOperation({ 
-        description: "required username email and password.", 
-        summary: 'use for register new user.'
-    })
-    @ApiCreatedResponse({
-        description: 'register user',
-    })
-    async register(@Body() createUser: CreateUserDto) {
-        const res = await this.authService.register(createUser);
-        return res;
-    }
+  @Public()
+  @Post('/register')
+  @ApiOperation({
+    description: 'required username email and password.',
+    summary: 'use for register new user.',
+  })
+  @ApiCreatedResponse({
+    description: 'register user',
+  })
+  async register(@Body() createUser: CreateUserDto) {
+    const res = await this.authService.register(createUser);
+    return res;
+  }
 
-    @Public()
-    @Post('/signin')
-    @ApiOperation({ 
-        description: "use only username or email with password.", 
-        summary: 'use for sign in.' 
-    })
-    @ApiCreatedResponse({
-        description: 'user sign in',
-    })
-    async signIn(@Body() payload: SigninDto){
-        console.log("signin",payload);
-        const res = await this.authService.signIn(payload);
-        return res;
-    }
+  @Public()
+  @Post('/signin')
+  @ApiOperation({
+    description: 'use only username or email with password.',
+    summary: 'use for sign in.',
+  })
+  @ApiCreatedResponse({
+    description: 'user sign in',
+  })
+  async signIn(@Body() payload: SigninDto) {
+    const res = await this.authService.signIn(payload);
+    return res;
+  }
 }

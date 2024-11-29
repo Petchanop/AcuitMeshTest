@@ -7,6 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { UserRole } from '../entities/users.entity';
+import { Timestamp } from 'typeorm';
 
 export const passwordRegEx =
   /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
@@ -62,4 +63,17 @@ export class UpdateUserDto {
   })
   @ApiProperty()
   password: string;
+}
+
+export class UserResponseDto {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+
+  constructor(partial: Partial<UserResponseDto>) {
+    Object.assign(this, partial);
+  }
 }

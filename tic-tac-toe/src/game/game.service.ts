@@ -295,7 +295,6 @@ export class GameService {
     const winPlayer2 = result.filter(
       (game) => game.player2.id == user.id && game.winner == GameWinner.Player2,
     );
-    console.log(winPlayer1, winPlayer2);
     const draw = result.filter((game) => game.winner == GameWinner.Draw);
     const userHistory = new UserHistory({
       gamePlayed: result.length,
