@@ -21,9 +21,20 @@
 
 ### get user Id from another user
 
-![get user id]()
+![get user id](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/get_user_pagination_pagesize.png)
+
+### get user result
+
+![get user result](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/get_user_result.png)
 
 ### send invitation to another user with userId
 
 ![send invitation](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/send_invitation_by_userid.png)
+
+### create game with invitation id which status is accepted by receiver
+
+![create game]()
+
+### playgame with /games/{gameId}/move
+![move position](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/play_game_with_game_id_and_position.png)
 
