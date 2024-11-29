@@ -16,10 +16,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { GameService } from './game.service';
-import { Game } from './entities/game.entity';
 import { UUID } from 'crypto';
 import { Move } from 'src/move/entities/move.entity';
-import { GameBoardDto, MovePositionDto } from './dto/game.dto';
+import { GameBoardDto, MovePositionDto, UserHistory } from './dto/game.dto';
 
 @ApiTags('games')
 @Controller('games')
@@ -53,7 +52,7 @@ export class GameController {
   }
 
   @Get('me')
-  @ApiOperation({ summary: 'Get user game details' })
+  @ApiOperation({ description: "player1 is X, player2 is O", summary: 'Get user game details' })
   @ApiResponse({ status: 200, description: 'Game retrieved successfully', type: [GameBoardDto] })
   @ApiResponse({ status: 404, description: 'Game not found' })
   @ApiBearerAuth('JWT')
@@ -68,21 +67,8 @@ export class GameController {
     }
   }
 
-  @Get(':gameId/displaygame')
-  @ApiOperation({ summary: 'Display Board game by Id' })
-  @ApiResponse({
-    status: 200,
-    description: 'Display board game',
-    type: Promise<string[]>,
-  })
-  @ApiBearerAuth('JWT')
-  async getBoardGame(@Req() _req, @Param('gameId') gameId: number): Promise<{ currentturn: string; boardGame: string[] }> {
-    const result = await this.gameService.getGameBoard(gameId);
-    return result;
-  }
-
   @Get(':gameId')
-  @ApiOperation({ summary: 'Get game details by ID' })
+  @ApiOperation({ description: "player1 is X, player2 is O", summary: 'Get game details by ID' })
   @ApiResponse({ status: 200, description: 'Game retrieved successfully', type: GameBoardDto })
   @ApiResponse({ status: 404, description: 'Game not found' })
   @ApiBearerAuth('JWT')
@@ -98,7 +84,10 @@ export class GameController {
   }
 
   @Post(':gameId/move')
-  @ApiOperation({ summary: 'Make a move in the game' })
+  @ApiOperation({ 
+    description:"please fill number 0 - 8 for board position\n\n[0 1 2]\n\n[3 4 5]\n\n[6 7 8]\n\nplayer1 is X, player2 is O",
+    summary: 'Make a move in the game' 
+  })
   @ApiResponse({
     status: 201,
     description: 'Move successfully made',
@@ -122,18 +111,15 @@ export class GameController {
       );
     }
 
-    try {
-      return await this.gameService.makeMove(gameId, _req.user, payload.position);
-    } catch (error) {
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      ) {
-        throw error;
-      }
-      throw new BadRequestException('Failed to make move');
-    }
+    return await this.gameService.makeMove(gameId, _req.user, payload.position);
   }
 
- 
+  @Get('history/me')
+  @ApiOperation({ description: "player1 is X, player2 is O", summary: 'Get user game details' })
+  @ApiResponse({ status: 200, description: 'Game retrieved successfully', type: UserHistory })
+  @ApiResponse({ status: 404, description: 'Game not found' })
+  @ApiBearerAuth('JWT')
+  async getUserGameHistory(@Req() _req): Promise<UserHistory> {
+    return await this.gameService.getUserHistory(_req.user);
+  }
 }

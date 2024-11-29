@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   OneToOne,
   JoinColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty } from 'class-validator';
@@ -56,4 +57,7 @@ export class Invitation {
   @CreateDateColumn()
   @ApiProperty({ description: 'Timestamp when the invitation was created' })
   created_at: Date;
+
+  @UpdateDateColumn({ nullable: true })
+  updated_at: Date;
 }

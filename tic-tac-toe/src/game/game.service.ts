@@ -12,7 +12,7 @@ import { Move } from '../move/entities/move.entity';
 import { UUID } from 'crypto';
 import { Invitation } from '../invitations/entities/invitaions.entity';
 import { User } from '../users/entities/users.entity';
-import { GameBoardDto } from './dto/game.dto';
+import { GameBoardDto, UserHistory } from './dto/game.dto';
 
 @Injectable()
 export class GameService {
@@ -82,7 +82,11 @@ export class GameService {
   }
 
   async createGameBoard(game: Game, moves: Move[]): Promise<string[]> {
-    const board = Array.from({ length: 3 }, () => Array(3).fill(' '));
+    const rows = 3;
+    const cols = 3;
+    const board = Array.from({ length: rows }, (_, row) =>
+      Array.from({ length: cols }, (_, col) => (row * cols + col).toString()),
+    );
 
     // Fill the board based on moves
     if (typeof moves !== 'undefined') {
@@ -104,7 +108,13 @@ export class GameService {
       invitationId: game.invitation?.invitation_id,
       winner: game.winner,
       player1: game.player1.username,
+      player1Move: game.moves
+        .filter((move) => move.player.id == game.player1.id)
+        .map((move) => move.position),
       player2: game.player2.username,
+      player2Move: game.moves
+        .filter((move) => move.player.id == game.player2.id)
+        .map((move) => move.position),
       status: game.status,
       currentTurn:
         game.player1.id === game.currentTurn
@@ -200,7 +210,13 @@ export class GameService {
       gameId: game.game_id,
       winner: game.winner,
       player1: game.player1.id,
+      player1Move: game.moves
+        .filter((move) => move.player == game.player1)
+        .map((move) => move.position),
       player2: game.player2.id,
+      player2Move: game.moves
+        .filter((move) => move.player == game.player1)
+        .map((move) => move.position),
       board: await this.createGameBoard(game, game.moves),
     });
 
@@ -260,5 +276,25 @@ export class GameService {
           : game.player2.username,
       boardGame: await this.createGameBoard(game, moves),
     };
+  }
+
+  async getUserHistory(user: User): Promise<UserHistory> {
+    const result = await this.dataSource.getRepository(Game).find({
+      where: [
+        { player1: { id: user.id } },
+        { player2: { id: user.id } },
+        { status: GameStatus.Completed },
+      ],
+      relations: ['player1', 'player2', 'moves'],
+    });
+    const win = result.filter((game) => game.winner == user.username);
+    const draw = result.filter((game) => game.winner == GameWinner.Draw);
+    const userHistory = new UserHistory({
+      gamePlayed: result.length,
+      win: win.length,
+      draw: draw.length,
+      loss: result.length - (win.length + draw.length),
+    });
+    return userHistory;
   }
 }
