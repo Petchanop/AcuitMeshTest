@@ -18,7 +18,11 @@ import {
 } from '@nestjs/swagger';
 import { Invitation } from './entities/invitaions.entity';
 import { InvitationsService } from './invitations.service';
-import { CreateInvitationDto, InvitationType } from './dto/invitations.dto';
+import {
+  CreateInvitationDto,
+  InvitationDto,
+  InvitationType,
+} from './dto/invitations.dto';
 import { UUID } from 'crypto';
 import * as slugid from 'slugid';
 
@@ -39,7 +43,7 @@ export class InvitationsController {
   async createInvitation(
     @Req() req,
     @Body() createInvitationDto: CreateInvitationDto,
-  ): Promise<Invitation> {
+  ): Promise<InvitationDto> {
     const { receiverId } = createInvitationDto;
     return this.invitationService.createInvitation(
       req.user,
@@ -52,14 +56,14 @@ export class InvitationsController {
   @ApiResponse({
     status: 200,
     description: 'Invitation accepted successfully',
-    type: Invitation,
+    type: InvitationDto,
   })
   @ApiResponse({ status: 404, description: 'Invitation not found' })
   @ApiBearerAuth('JWT')
   async acceptInvitation(
     @Req() req,
     @Param('id') invitationId: UUID,
-  ): Promise<Invitation> {
+  ): Promise<InvitationDto> {
     return this.invitationService.acceptInvitation(req.user, invitationId);
   }
 
@@ -68,14 +72,14 @@ export class InvitationsController {
   @ApiResponse({
     status: 200,
     description: 'Invitation rejected successfully',
-    type: Invitation,
+    type: InvitationDto,
   })
   @ApiResponse({ status: 404, description: 'Invitation not found' })
   @ApiBearerAuth('JWT')
   async rejectInvitation(
     @Req() req,
     @Param('id') invitationId: UUID,
-  ): Promise<Invitation> {
+  ): Promise<InvitationDto> {
     return this.invitationService.rejectInvitation(req.user, invitationId);
   }
 
@@ -85,14 +89,14 @@ export class InvitationsController {
   @ApiResponse({
     status: 200,
     description: 'List of invitations',
-    type: [Invitation],
+    type: [InvitationDto],
   })
   @ApiResponse({ status: 404, description: 'No invitations found' })
   @ApiBearerAuth('JWT')
   async getInvitationsByUserId(
     @Param('userId') userId: string,
     @Query('type') _type: InvitationType = InvitationType.DEFAULT,
-  ): Promise<Invitation[]> {
+  ): Promise<InvitationDto[]> {
     try {
       return await this.invitationService.getInvitationsByUserId(
         slugid.decode(userId) as UUID,
@@ -112,13 +116,13 @@ export class InvitationsController {
   @ApiResponse({
     status: 200,
     description: 'List user receive invitation.',
-    type: [Invitation],
+    type: [InvitationDto],
   })
   @ApiBearerAuth('JWT')
   async getUserInvitation(
     @Req() _req,
     @Query('type') _type: InvitationType = InvitationType.DEFAULT,
-  ): Promise<Invitation[]> {
+  ): Promise<InvitationDto[]> {
     return await this.invitationService.getInvitationsByUserId(
       _req.user.id,
       _type,

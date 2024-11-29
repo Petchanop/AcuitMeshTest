@@ -1,5 +1,7 @@
 import { IsEnum, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { InvitationStatus } from '../entities/invitaions.entity';
+import { UUID } from 'crypto';
 
 export enum InvitationType {
   SENDER = 'sender',
@@ -18,4 +20,25 @@ export class TypeInvitationDto {
   @IsEnum(InvitationType, { each: true })
   @IsNotEmpty()
   type: InvitationType;
+}
+
+export class UserDataDto {
+  id: UUID;
+  username: string;
+  email: string;
+
+  constructor(partial: Partial<UserDataDto>) {
+    Object.assign(this, partial);
+  }
+}
+
+export class InvitationDto {
+  id: string;
+  sender: UserDataDto;
+  receiver: UserDataDto;
+  status: InvitationStatus;
+
+  constructor(partial: Partial<InvitationDto>) {
+    Object.assign(this, partial);
+  }
 }

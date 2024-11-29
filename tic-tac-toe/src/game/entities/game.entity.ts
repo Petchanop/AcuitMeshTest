@@ -6,12 +6,15 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsDate } from 'class-validator';
 import { User } from '../../users/entities/users.entity';
 import { Move } from '../../move/entities/move.entity';
 import { UUID } from 'crypto';
+import { Invitation } from 'src/invitations/entities/invitaions.entity';
 
 export enum GameStatus {
   InProgress = 'InProgress',
@@ -30,6 +33,10 @@ export class Game {
   @PrimaryGeneratedColumn()
   @ApiProperty({ description: 'Unique identifier for the game' })
   game_id: number;
+
+  @OneToOne(() => Invitation, (invitation) => invitation.game)
+  @JoinColumn()
+  invitation: Invitation | null;
 
   @ManyToOne(() => User, (user) => user.gamesAsPlayer1, { eager: true })
   @ApiProperty({ description: 'Player 1 of the game', type: () => User })

@@ -18,7 +18,7 @@ async function bootstrap() {
     .addTag('users')
     .addTag('auth')
     .addTag('invitations')
-    .addTag('game')
+    .addTag('games')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'JWT',

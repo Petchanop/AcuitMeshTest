@@ -33,12 +33,12 @@ export class GameController {
   @ApiResponse({
     status: 201,
     description: 'Game successfully created',
-    type: Game,
+    type: GameBoardDto,
   })
   @ApiResponse({ status: 404, description: 'Invitation not found' })
   @ApiResponse({ status: 400, description: 'Invitation is not accepted' })
   @ApiBearerAuth('JWT')
-  async createGame(@Req() _req, @Param('invitationId') invitationId: UUID): Promise<Game> {
+  async createGame(@Req() _req, @Param('invitationId') invitationId: UUID): Promise<GameBoardDto> {
     try {
       return await this.gameService.createGame(invitationId);
     } catch (error) {
@@ -54,18 +54,17 @@ export class GameController {
 
   @Get('me')
   @ApiOperation({ summary: 'Get user game details' })
-  @ApiResponse({ status: 200, description: 'Game retrieved successfully', type: [Game] })
+  @ApiResponse({ status: 200, description: 'Game retrieved successfully', type: [GameBoardDto] })
   @ApiResponse({ status: 404, description: 'Game not found' })
   @ApiBearerAuth('JWT')
-  async getUserGame(@Req() _req): Promise<Game[]> {
+  async getUserGame(@Req() _req): Promise<GameBoardDto[]> {
     try {
-      console.log(_req.user.id)
       return await this.gameService.getGameByUserId(_req.user.id);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      throw new NotFoundException(`Failed to retrieve game with ID ${_req.user.id}}`);
+      throw new NotFoundException(`Failed to retrieve game with ID ${_req.user.id}`);
     }
   }
 
@@ -77,17 +76,17 @@ export class GameController {
     type: Promise<string[]>,
   })
   @ApiBearerAuth('JWT')
-  async getBoardGame(@Req() _req, @Param('gameId') gameId: number): Promise<string[]> {
+  async getBoardGame(@Req() _req, @Param('gameId') gameId: number): Promise<{ currentturn: string; boardGame: string[] }> {
     const result = await this.gameService.getGameBoard(gameId);
     return result;
   }
 
   @Get(':gameId')
   @ApiOperation({ summary: 'Get game details by ID' })
-  @ApiResponse({ status: 200, description: 'Game retrieved successfully', type: Game })
+  @ApiResponse({ status: 200, description: 'Game retrieved successfully', type: GameBoardDto })
   @ApiResponse({ status: 404, description: 'Game not found' })
   @ApiBearerAuth('JWT')
-  async getGameById(@Req() _req, @Param('gameId') gameId: number): Promise<Game> {
+  async getGameById(@Req() _req, @Param('gameId') gameId: number): Promise<GameBoardDto> {
     try {
       return await this.gameService.getGameById(gameId);
     } catch (error) {

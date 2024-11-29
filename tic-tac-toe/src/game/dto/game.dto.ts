@@ -12,11 +12,13 @@ export class MovePositionDto {
 }
 
 export class GameBoardDto {
-  invitationId: UUID;
   gameId: number;
+  invitationId: UUID;
   winner: string;
   player1: string;
   player2: string;
+  currentTurn: string;
+  status: string;
   board: string[];
 
   constructor(partial: Partial<GameBoardDto>) {

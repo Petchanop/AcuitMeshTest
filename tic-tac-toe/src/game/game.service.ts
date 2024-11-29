@@ -81,7 +81,41 @@ export class GameService {
           : false;
   }
 
-  async createGame(invitationId: UUID): Promise<Game> {
+  async createGameBoard(game: Game, moves: Move[]): Promise<string[]> {
+    const board = Array.from({ length: 3 }, () => Array(3).fill(' '));
+
+    // Fill the board based on moves
+    if (typeof moves !== 'undefined') {
+      moves.forEach((move) => {
+        const col = move.position % 3;
+        const row = Math.floor(move.position / 3);
+        board[row][col] = move.player.id === game.player1.id ? 'X' : 'O';
+      });
+    }
+
+    return board.map((row) => {
+      return row.join('');
+    });
+  }
+
+  async createGameDto(game: Game): Promise<GameBoardDto> {
+    const result = new GameBoardDto({
+      gameId: game.game_id,
+      invitationId: game.invitation?.invitation_id,
+      winner: game.winner,
+      player1: game.player1.username,
+      player2: game.player2.username,
+      status: game.status,
+      currentTurn:
+        game.player1.id === game.currentTurn
+          ? game.player1.username
+          : game.player2.username,
+      board: await this.createGameBoard(game, game.moves),
+    });
+    return result;
+  }
+
+  async createGame(invitationId: UUID): Promise<GameBoardDto> {
     const invitation = await this.dataSource.getRepository(Invitation).findOne({
       where: { invitation_id: invitationId },
       relations: ['sender', 'receiver'],
@@ -101,12 +135,15 @@ export class GameService {
 
     // Create the game using sender and receiver
     const game = new Game();
+    game.invitation = invitation;
     game.player1 = invitation.receiver;
     game.player2 = invitation.sender;
     game.currentTurn = invitation.receiver.id; // Assume the sender starts the game
     game.status = GameStatus.InProgress;
+    game.moves = [];
 
-    return this.gameRepository.save(game);
+    const gameDto = await this.gameRepository.save(game);
+    return await this.createGameDto(gameDto);
   }
 
   async makeMove(
@@ -114,7 +151,10 @@ export class GameService {
     player: User,
     position: number,
   ): Promise<GameBoardDto> {
-    const game = await this.getGameById(gameId);
+    const game = await this.gameRepository.findOne({
+      where: { game_id: gameId },
+      relations: ['player1', 'player2', 'moves'],
+    });
     if (game.status !== GameStatus.InProgress) {
       throw new HttpException('Game is not in progress', HttpStatus.CONFLICT);
     }
@@ -122,13 +162,12 @@ export class GameService {
       throw new HttpException('It is not your turn', HttpStatus.BAD_REQUEST);
     }
 
-    let savedMove;
     const move = new Move();
     move.game = game;
     move.player = player;
     if (this.availablePosition(game, position)) {
       move.position = position;
-      savedMove = await this.dataSource.getRepository(Move).create(move);
+      await this.dataSource.getRepository(Move).create(move);
     } else {
       throw new HttpException(
         'Cannot move to this position.',
@@ -168,7 +207,7 @@ export class GameService {
     return result;
   }
 
-  async getGameById(gameId: number): Promise<Game> {
+  async getGameById(gameId: number): Promise<GameBoardDto> {
     // Fetch the game with its players and moves relations
     const game = await this.gameRepository.findOne({
       where: { game_id: gameId },
@@ -180,33 +219,23 @@ export class GameService {
       throw new NotFoundException(`Game with ID ${gameId} not found`);
     }
 
-    return game;
+    return await this.createGameDto(game);
   }
 
-  async getGameByUserId(userId: UUID): Promise<Game[]> {
+  async getGameByUserId(userId: UUID): Promise<GameBoardDto[]> {
     console.log('get game by user id', userId);
-    return await this.dataSource.getRepository(Game).find({
+    const result = await this.dataSource.getRepository(Game).find({
       where: [{ player1: { id: userId } }, { player2: { id: userId } }],
-      relations: ['player1', 'player2'],
+      relations: ['player1', 'player2', 'moves'],
     });
+    return await Promise.all(
+      result.map(async (game) => await this.createGameDto(game)),
+    );
   }
 
-  async createGameBoard(game: Game, moves: Move[]): Promise<string[]> {
-    const board = Array.from({ length: 3 }, () => Array(3).fill(' '));
-
-    // Fill the board based on moves
-    moves.forEach((move) => {
-      const col = move.position % 3;
-      const row = Math.floor(move.position / 3);
-      board[row][col] = move.player.id === game.player1.id ? 'X' : 'O';
-    });
-
-    return board.map((row) => {
-      return row.join('');
-    });
-  }
-
-  async getGameBoard(gameId: number): Promise<string[]> {
+  async getGameBoard(
+    gameId: number,
+  ): Promise<{ currentturn: string; boardGame: string[] }> {
     // Fetch the game
     const game = await this.dataSource.getRepository(Game).findOne({
       where: { game_id: gameId },
@@ -224,6 +253,12 @@ export class GameService {
     });
 
     // Initialize the board with empty strings
-    return await this.createGameBoard(game, moves);
+    return {
+      currentturn:
+        game.player1.id === game.currentTurn
+          ? game.player1.username
+          : game.player2.username,
+      boardGame: await this.createGameBoard(game, moves),
+    };
   }
 }
