@@ -1,5 +1,10 @@
 # AcuitMeshTest
 
+Use vscode devcontainer to run this repo
+- ctrl + shift + p
+- select rebuild and reopen with container
+- initialize project with npm i
+
 ## User routes
 
 ![user routes](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/users_routes.png)
