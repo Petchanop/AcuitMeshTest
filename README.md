@@ -33,8 +33,11 @@
 
 ### create game with invitation id which status is accepted by receiver
 
-![create game]()
+![create game](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/create_game_with_invitation_id.png)
 
 ### playgame with /games/{gameId}/move
 ![move position](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/play_game_with_game_id_and_position.png)
 
+
+## check game detail which user is a player
+![check game detail](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/game_detail_result.png)
