@@ -38,6 +38,10 @@
 ### playgame with /games/{gameId}/move
 ![move position](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/play_game_with_game_id_and_position.png)
 
+### result after make move
+
+![move result](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/make_move_result.png)
+
 
 ## check game detail which user is a player
 ![game me route](https://github.com/Petchanop/AcuitMeshTest/blob/master/image/get_player_game_detail.png)
